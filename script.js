@@ -6,16 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
-    console.log("Logout button found, attaching listener");
+    console.log("✓ Logout button found");
     logoutBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log("Logout button clicked!");
+      console.log("🔴 Logout button clicked!");
       logoutWallet();
-      return false;
     });
-  } else {
-    console.log("Logout button NOT found");
   }
 
   // Check if on dashboard page
@@ -27,8 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("index.html") || window.location.pathname === "/") {
     const wallet = localStorage.getItem("wallet");
     if (wallet) {
-      // User is already connected, redirect to dashboard
-      console.log("User already connected, redirecting to dashboard");
+      console.log("✓ User already connected, redirecting to dashboard");
       window.location.href = "dashboard.html";
     }
   }
@@ -42,9 +38,9 @@ function checkAuth() {
   
   console.log("Checking auth - wallet:", wallet);
   
-  // If no wallet, redirect
+  // If no wallet in localStorage, user is NOT authenticated
   if (!wallet) {
-    console.log("Not authenticated - redirecting to index");
+    console.log("❌ Not authenticated - redirecting to index");
     window.location.href = "index.html";
     return false;
   }
@@ -58,27 +54,34 @@ function checkAuth() {
 ========================================== */
 async function connectWallet() {
   if (!window.ethereum) {
-    alert("MetaMask not found!");
+    alert("MetaMask not found! Please install MetaMask.");
     return;
   }
 
   try {
-    console.log("Connecting wallet...");
+    console.log("🔗 Connecting wallet...");
     
     // Request account access
-    await ethereum.request({ method: "eth_requestAccounts" });
-    const accounts = await ethereum.request({ method: "eth_accounts" });
+    const accounts = await window.ethereum.request({ 
+      method: "eth_requestAccounts" 
+    });
+    
     const wallet = accounts[0];
-
-    console.log("Wallet connected:", wallet);
+    console.log("✓ Wallet connected:", wallet);
+    
+    // Store wallet in localStorage
     localStorage.setItem("wallet", wallet);
     
     // Redirect to dashboard
     window.location.href = "dashboard.html";
 
   } catch (err) {
-    console.error("connectWallet error:", err);
-    alert("Connection failed: " + err.message);
+    console.error("❌ Connect wallet error:", err);
+    if (err.code === 4001) {
+      alert("You rejected the connection request.");
+    } else {
+      alert("Connection failed: " + err.message);
+    }
   }
 }
 
@@ -156,12 +159,12 @@ function updateNetworkButtons() {
 async function loadDashboard() {
   const wallet = localStorage.getItem("wallet");
   if (!wallet) {
-    console.log("No wallet found in loadDashboard");
+    console.log("❌ No wallet found in loadDashboard");
     window.location.href = "index.html";
     return;
   }
 
-  console.log("Loading dashboard for:", wallet);
+  console.log("📊 Loading dashboard for:", wallet);
   
   const walletEl = document.getElementById("wallet");
   const networkNameEl = document.getElementById("networkName");
@@ -207,7 +210,7 @@ async function loadBalance(wallet) {
     window.dashboardEthValue = { balance: parseFloat(eth), price };
 
   } catch (e) {
-    console.error("Balance error:", e);
+    console.error("❌ Balance error:", e);
     const ethPriceEl = document.getElementById("ethPrice");
     if (ethPriceEl) ethPriceEl.innerText = 'ERROR';
   }
@@ -298,23 +301,50 @@ function calculatePortfolioValue() {
 }
 
 /* ==========================================
-                LOGOUT - FIXED
+           LOGOUT - PROPERLY FIXED
 ========================================== */
-function logoutWallet() {
-  console.log("Logging out...");
+async function logoutWallet() {
+  console.log("🔓 Starting logout process...");
   
-  // Clear wallet data from localStorage
+  try {
+    // Step 1: Check if MetaMask is available
+    if (window.ethereum) {
+      console.log("🔌 Disconnecting from MetaMask...");
+      
+      // Step 2: Disconnect from MetaMask (clear permissions)
+      try {
+        // Request to clear the connection
+        await window.ethereum.request({
+          method: "wallet_revokePermissions",
+          params: [
+            {
+              eth_accounts: {}
+            }
+          ]
+        });
+        console.log("✓ MetaMask connection revoked");
+      } catch (revokeError) {
+        // If revoke fails, that's okay - continue with logout
+        console.log("⚠ Could not revoke MetaMask permissions (this is normal):", revokeError.message);
+      }
+    }
+  } catch (error) {
+    console.log("⚠ Error during disconnect:", error);
+  }
+  
+  // Step 3: Clear all app data (always do this regardless of MetaMask)
+  console.log("🗑 Clearing app data...");
   localStorage.removeItem("wallet");
-  
-  // Clear session storage
   sessionStorage.clear();
   
   // Clear all cached data
   window.dashboardEthValue = null;
   window.tokenValues = null;
+  currentNetwork = "mainnet";
   
-  console.log("Wallet disconnected, redirecting to index.html");
+  console.log("✓ All data cleared");
   
-  // Force immediate redirect
+  // Step 4: Redirect to index.html
+  console.log("→ Redirecting to index.html");
   window.location.replace("index.html");
 }
