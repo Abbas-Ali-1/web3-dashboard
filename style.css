@@ -1,208 +1,276 @@
-/* ---------- INDEX.HTML (Landing Page) ---------- */
-body.index {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
-    background-size: 400% 400%;
-    animation: gradientMove 10s ease infinite;
-}
-
-.container {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 60px 40px;
-    box-shadow: 0 0 50px rgba(0,0,0,0.35);
-    width: 450px;
-}
-
-.title {
-    color: #fff;
-    font-size: 36px;
-    margin-bottom: 15px;
-}
-
-.subtitle {
-    color: #f0f0f0;
-    font-size: 18px;
-    margin-bottom: 30px;
-}
-
-.connect-btn {
-    padding: 15px 50px;
-    font-size: 18px;
-    cursor: pointer;
-    border: none;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.25);
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-    transition: 0.3s ease;
-}
-
-.connect-btn:hover {
-    background: rgba(255, 255, 255, 0.45);
-    transform: scale(1.05);
-}
-
-.connect-btn:active {
-    transform: scale(0.97);
-}
-
-/* ---------- COMMON ---------- */
+/* ---------- Global Styles ---------- */
 body {
     margin: 0;
-    padding: 0;
-    font-family: "Poppins", Arial, sans-serif;
-}
-
-/* ---------- INDEX.HTML (Landing Page) ---------- */
-body.index {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
-    background-size: 400% 400%;
-    animation: gradientMove 10s ease infinite;
-}
-
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Landing Page Container */
-.container {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 50px 40px;
-    box-shadow: 0 0 40px rgba(0,0,0,0.25);
-    width: 400px;
-}
-
-/* Titles */
-.title {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0a0f24, #131b3a, #0a0f24);
     color: #fff;
-    font-size: 36px;
-    margin-bottom: 15px;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
 }
 
-.subtitle {
-    color: #f0f0f0;
+/* ---------- Sidebar ---------- */
+.sidebar {
+    width: 270px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+}
+.logo span {
+    color: #4dd2ff;
+}
+
+.menu a {
+    display: block;
+    padding: 12px 0;
+    font-size: 17px;
+    opacity: 0.8;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.menu a:hover,
+.menu .active {
+    opacity: 1;
+    color: #4dd2ff;
+    transform: translateX(5px);
+}
+
+/* Logout Button */
+.logout-btn {
+    margin-top: auto;
+    padding: 12px 15px;
+    background: #ff4d6d;
+    border: none;
+    border-radius: 10px;
     font-size: 16px;
+    cursor: pointer;
+    transition: .2s;
+}
+.logout-btn:hover {
+    background: #ff3355;
+}
+
+/* ---------- Main Content ---------- */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.page-title {
+    font-size: 30px;
     margin-bottom: 30px;
 }
 
-/* Connect Button */
-.connect-btn {
-    padding: 15px 50px;
-    font-size: 18px;
-    cursor: pointer;
-    border: none;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.25);
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-    transition: 0.3s ease;
-}
-
-.connect-btn:hover {
-    background: rgba(255, 255, 255, 0.45);
-    transform: scale(1.05);
-}
-
-.connect-btn:active {
-    transform: scale(0.97);
-}
-
-/* ---------- DASHBOARD.HTML (Glass Web3 Dashboard) ---------- */
-body.dashboard {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 50px;
-    background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
-    background-size: 400% 400%;
-    animation: gradientMove 10s ease infinite;
-}
-
-.dashboard-container {
-    width: 90%;
-    max-width: 1000px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-
-.dashboard-title {
-    color: #fff;
-    text-align: center;
-    font-size: 36px;
-    margin-bottom: 10px;
-}
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 30px rgba(0,0,0,0.25);
+/* ---------- Card UI ---------- */
+.card {
     padding: 25px;
-    color: #fff;
-    text-align: center;
+    border-radius: 20px;
+    min-height: 120px;
 }
 
-.glass-card h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-decoration-line: underline;
+.glass {
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 0 25px rgba(0,0,0,0.15);
+    backdrop-filter: blur(12px);
 }
 
-#tokens table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.card.wide {
+    grid-column: span 2;
+}
+
+/* Typography */
+.info {
+    opacity: 0.8;
     margin-top: 10px;
 }
-
-#tokens th, #tokens td {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-}
-
-#tokens th {
-    background: rgba(255, 255, 255, 0.2);
+.big-info {
+    font-size: 26px;
     font-weight: 600;
 }
 
-#tokens td img {
+.small {
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* Token list */
+.token-list {
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.7;
+}
+.token-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.token-logo {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 768px) {
-    .dashboard-container, .container {
-        width: 95%;
-    }
+.chain {
+    font-size: 13px;
+    opacity: 0.7;
+}
 
-    .glass-card, .container {
-        padding: 20px;
-    }
+/* ---------- Center Body (Index Page) ---------- */
+.center-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #0a0f24, #131b3a, #0a0f24);
+}
 
-    .dashboard-title, .title {
-        font-size: 28px;
-    }
+/* Center card styling */
+.center-body .card {
+    padding: 40px;
+    width: 380px;
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 0 25px rgba(0,0,0,0.15);
+}
+
+/* Title */
+.center-body h1 {
+    margin-bottom: 25px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+/* Connect button */
+.main-btn {
+    background: #4dd2ff;
+    padding: 14px 22px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    color: #000;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.main-btn:hover {
+    background: #32c4f8;
+    transform: translateY(-2px);
+}
+
+#ethBalance{font-size: medium;
+            font-weight: normal;
+}
+#portfolioValue{font-size: medium;
+                font-weight: medium;
+}
+
+th{padding-right: 300px;
+
+}
+/* Network Selector (in sidebar) */
+.sidebar .network-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.network-btn {
+  padding: 12px 15px;
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.network-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.network-btn.active {
+  background: #4dd2ff;
+  color: #000;
+  border-color: #4dd2ff;
+  box-shadow: 0 0 15px rgba(77,210,255,0.2);
+}
+
+.current-network {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+/* Add this to your existing style.css */
+
+/* Main Content - make it a flex container */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    position: relative; /* Important for absolute positioning */
+}
+
+/* Network Selector - position in top right */
+.network-selector {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 0; /* Remove bottom margin since it's positioned */
+  z-index: 10; /* Ensure it stays on top */
+}
+
+/* Current network text - also move to top right area */
+.current-network {
+  position: absolute;
+  top: 90px; /* Below the buttons */
+  right: 40px;
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 0;
+  display: block;
+}
+
+/* Page title - add some right padding so it doesn't overlap with buttons */
+.page-title {
+    font-size: 30px;
+    margin-bottom: 30px;
+    padding-right: 400px; /* Give space for the buttons */
 }

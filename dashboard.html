@@ -1,37 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Web3 Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Web3 Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="dashboard">
 
-    <div class="dashboard-container">
+<body class="dashboard-body">
 
-        <h1 class="dashboard-title">Your Dashboard</h1>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+      <h2 class="logo">Crypto<span>Hub</span></h2>
 
-        <!-- Wallet Card -->
-        <div class="glass-card" id="walletCard">
-            <h2>Wallet Address</h2>
-            <p id="wallet">Loading...</p>
-        </div>
+      <nav class="menu">
+          <a class="active">Dashboard</a>
+      </nav>
 
-        <!-- ETH Balance Card -->
-        <div class="glass-card" id="ethCard">
-            <h2>Balance</h2>
-            <p id="ethBalance">Loading...</p>
-            <p id="tokenPrice">ETH Live Price: $0.00</p>
-            <p id="portfolioValue">Total Portfolio Value: $0.00</p>
-        </div>
+      <!-- Logout button -->
+      <!-- Replace this line in your dashboard.html -->
+    <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+  </aside>
 
-        <!-- Token List -->
-        <div class="glass-card" id="tokenCard">
-            <h2>Your Tokens</h2>
-            <div id="tokens">Loading tokens...</div>
-        </div>
+  <!-- Main Content -->
+  <div class="main-content">
 
-    </div>
+      <h1 class="page-title">Your Web3 Dashboard</h1>
 
-    <script src="script.js"></script>
+      <!-- Network Selector -->
+      <div class="network-selector">
+        <button class="network-btn active" data-network="mainnet" onclick="switchNetwork('mainnet')">
+            🌐 Mainnet
+        </button>
+        <button class="network-btn" data-network="testnet" onclick="switchNetwork('testnet')">
+            🧪 Testnet
+        </button>
+      </div>
+
+      <p class="current-network">Connected to: <strong id="networkName">Mainnet</strong></p>
+
+      <div class="grid">
+
+          <!-- Wallet Card -->
+          <div class="card glass">
+              <h2>Wallet Address</h2>
+              <p id="wallet" class="info">Loading...</p>
+          </div>
+
+          <!-- Balance Card -->
+          <div class="card glass">
+              <h2>Portfolio Value</h2>
+              <p id="portfolioValue" class="info small">loading...</p>
+              <br>
+              <h3>ETH Balance</h3>
+              <p id="ethBalance" class="big-info">Loading...</p>
+              <p id="ethPrice" class="info small"></p>
+              
+          </div>
+
+          <!-- Token List (table) -->
+          <div class="card glass wide">
+              <h2>Your Tokens</h2>
+
+              <table class="token-table">
+                  <thead>
+                      <tr>
+                          <th>Token</th>
+                          <th>Amount</th>
+                          <th>USD Value</th>
+                          <th>Chain</th>
+                      </tr>
+                  </thead>
+
+                  <tbody id="tokens">
+                      <tr>
+                          <td colspan="4">Loading...</td>
+                      </tr>
+                  </tbody>
+              </table>
+
+          </div>
+
+      </div>
+
+  </div>
+
+  <!-- Order is VERY important -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

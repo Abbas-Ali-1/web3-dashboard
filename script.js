@@ -1,268 +1,320 @@
-/*******************************
- * script.js
- * - Connect (index.html)
- * - Dashboard (dashboard.html)
- * - Automatic ERC-20 detection across multiple EVM chains via Moralis
- * - Token logos via Moralis metadata / CoinGecko fallback
- *******************************/
+console.log("script.js loaded");
 
-/* ===========================
-   CONFIG - put your Moralis key here
-   (You provided this key; leaving it in code is okay for testing,
-    but NOT recommended for production.)
-   =========================== */
-const MORALIS_API = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImQ3OTIwOWZjLTUwZjgtNDdkNy04ZjM2LTI5MzllY2Q4Nzc3OSIsIm9yZ0lkIjoiNDgxODI2IiwidXNlcklkIjoiNDk1Njk4IiwidHlwZUlkIjoiMjYyZDU1MWUtYjQwOC00NGZhLWE1NTEtZmEzYmNlNGQ5NzVhIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3NjMzODQ4NTUsImV4cCI6NDkxOTE0NDg1NX0.ZkRPX9eYSg1-KN3gZ9CNvhA8c-kKTnFiXafYMCeyk2Q";
-
-/* ===========================
-   Chains to scan with Moralis (EVM chains)
-   - feel free to add/remove identifiers Moralis supports
-   =========================== */
-const CHAINS = ["eth", "polygon", "bsc", "avalanche", "optimism", "arbitrum", "base"];
-
-const isIndex = !!document.getElementById("myButton");
-const isDashboard = window.location.pathname.includes("dashboard.html");
-
-/* -------------------------
-   CONNECT BUTTON (index.html)
-   ------------------------- */
-if (isIndex) {
+document.addEventListener("DOMContentLoaded", () => {
   const connectBtn = document.getElementById("myButton");
-  connectBtn.onclick = async () => {
-    if (!window.ethereum) {
-      alert("MetaMask not found. Install MetaMask and try again.");
-      return;
-    }
-    try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const wallet = accounts[0];
-      localStorage.setItem("walletAddress", wallet);
-      // go to dashboard
+  if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    console.log("Logout button found, attaching listener");
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Logout button clicked!");
+      logoutWallet();
+      return false;
+    });
+  } else {
+    console.log("Logout button NOT found");
+  }
+
+  // Check if on dashboard page
+  if (window.location.pathname.includes("dashboard.html")) {
+    checkAuth();
+  }
+  
+  // Check if on index page - redirect if already logged in
+  if (window.location.pathname.includes("index.html") || window.location.pathname === "/") {
+    const wallet = localStorage.getItem("wallet");
+    if (wallet) {
+      // User is already connected, redirect to dashboard
+      console.log("User already connected, redirecting to dashboard");
       window.location.href = "dashboard.html";
-    } catch (e) {
-      console.error("User rejected", e);
-      alert("Connection rejected.");
     }
-  };
+  }
+});
+
+/* ==========================================
+      CHECK AUTHENTICATION
+========================================== */
+function checkAuth() {
+  const wallet = localStorage.getItem("wallet");
+  
+  console.log("Checking auth - wallet:", wallet);
+  
+  // If no wallet, redirect
+  if (!wallet) {
+    console.log("Not authenticated - redirecting to index");
+    window.location.href = "index.html";
+    return false;
+  }
+  
+  loadDashboard();
+  return true;
 }
 
-/* -------------------------
-   DASHBOARD (dashboard.html)
-   ------------------------- */
-if (isDashboard) {
-
-  const wallet = localStorage.getItem("walletAddress");
-  if (!wallet) {
-    alert("No connected wallet found. Returning to connect page.");
-    window.location.href = "index.html";
+/* ==========================================
+                CONNECT WALLET
+========================================== */
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert("MetaMask not found!");
+    return;
   }
 
-  // UI elements
-  const walletEl = document.getElementById("wallet");
-  const ethBalEl = document.getElementById("ethBalance");
-  const ethPriceEl = document.getElementById("tokenPrice");
-  const portfolioEl = document.getElementById("portfolioValue");
-  const tokensEl = document.getElementById("tokens");
-  const backBtn = document.getElementById("backBtn");
+  try {
+    console.log("Connecting wallet...");
+    
+    // Request account access
+    await ethereum.request({ method: "eth_requestAccounts" });
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+    const wallet = accounts[0];
 
-  walletEl.innerText = "Wallet Address: " + wallet;
+    console.log("Wallet connected:", wallet);
+    localStorage.setItem("wallet", wallet);
+    
+    // Redirect to dashboard
+    window.location.href = "dashboard.html";
 
-  backBtn?.addEventListener("click", () => {
-    // quick way to "disconnect" in client: clear storage and go back
-    localStorage.removeItem("walletAddress");
-    window.location.href = "index.html";
+  } catch (err) {
+    console.error("connectWallet error:", err);
+    alert("Connection failed: " + err.message);
+  }
+}
+
+/* ==========================================
+        NETWORK CONFIGURATION
+========================================== */
+const NETWORKS = {
+  mainnet: {
+    name: "Mainnet",
+    chainIds: ["0x1"],
+    tokens: [
+      "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2", // WETH
+      "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+      "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
+      "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
+      "0x514910771AF9Ca656af840dff83E8264EcF986CA", // LINK
+      "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"  // WBTC
+    ]
+  },
+  testnet: {
+    name: "Testnet",
+    chainIds: ["0xaa36a7", "0x13881"],
+    tokens: [
+      "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9", // WETH (Sepolia)
+      "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", // UNI (Sepolia)
+      "0x6f14C02576fCb6c51f3a200F4c7367fEe1e2fEfD", // USDC (Sepolia)
+      "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889", // WMATIC (Mumbai)
+      "0xe6b8a5CF3BF352Ca4C69273F805C5CDA601D746b", // DAI (Mumbai)
+      "0x2c89bae432a5ba5cb79e10df3d4f0b4603718562"  // USDC (Mumbai)
+    ]
+  }
+};
+
+let currentNetwork = "mainnet";
+
+/* ==========================================
+        SWITCH NETWORK
+========================================== */
+async function switchNetwork(networkName) {
+  try {
+    currentNetwork = networkName;
+    const networkNameEl = document.getElementById("networkName");
+    if (networkNameEl) {
+      networkNameEl.innerText = NETWORKS[currentNetwork].name;
+    }
+    
+    updateNetworkButtons();
+    
+    const wallet = localStorage.getItem("wallet");
+    if (wallet) {
+      await autoDetectTokens(wallet);
+    }
+    
+  } catch (error) {
+    console.error("Network switch error:", error);
+  }
+}
+
+/* ==========================================
+        UPDATE NETWORK BUTTON STATES
+========================================== */
+function updateNetworkButtons() {
+  document.querySelectorAll(".network-btn").forEach(btn => {
+    if (btn.dataset.network === currentNetwork) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
   });
+}
 
-  // load everything
-  (async function init() {
-    try {
-      const eth = await loadNativeBalance(wallet);
-      const ethPrice = await loadEthPrice();
-      ethBalEl.innerText = `ETH Balance: ${eth.toFixed(6)}`;
-      ethPriceEl.innerText = `ETH Price (USD): $${Number(ethPrice).toLocaleString()}`;
-      // Load tokens from Moralis across chains and show
-      const tokenItems = await loadAllTokensAcrossChains(wallet);
-      // compute token USD values if available and sum portfolio
-      let totalUsd = eth * Number(ethPrice);
-      renderTokenTable(tokenItems);
-      // sum token USD if available
-      tokenItems.forEach(t => {
-        if (t.usd && !isNaN(t.usd)) totalUsd += Number(t.usd);
-      });
-      portfolioEl.innerText = `Total Portfolio Value (approx): $${totalUsd.toFixed(2)}`;
-    } catch (e) {
-      console.error(e);
-      tokensEl.innerText = "Failed to load tokens. Check console for details.";
-    }
-  })();
-
-  /* ---------- helper: fetch native balance (wei->ETH) ---------- */
-  async function loadNativeBalance(addr) {
-    // use MetaMask provider
-    try {
-      const balanceWeiHex = await window.ethereum.request({
-        method: "eth_getBalance",
-        params: [addr, "latest"]
-      });
-      // hex to decimal
-      const bal = parseInt(balanceWeiHex, 16) / 1e18;
-      return bal;
-    } catch (e) {
-      console.warn("eth_getBalance failed", e);
-      return 0;
-    }
+/* ==========================================
+            LOAD DASHBOARD CONTENT
+========================================== */
+async function loadDashboard() {
+  const wallet = localStorage.getItem("wallet");
+  if (!wallet) {
+    console.log("No wallet found in loadDashboard");
+    window.location.href = "index.html";
+    return;
   }
 
-  /* ---------- helper: fetch ETH price from CoinGecko ---------- */
-  async function loadEthPrice() {
-    try {
-      const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
-      const jd = await r.json();
-      return jd.ethereum.usd;
-    } catch (e) {
-      console.warn("CoinGecko ETH price failed", e);
-      return 0;
+  console.log("Loading dashboard for:", wallet);
+  
+  const walletEl = document.getElementById("wallet");
+  const networkNameEl = document.getElementById("networkName");
+  
+  if (walletEl) walletEl.innerText = wallet;
+  if (networkNameEl) networkNameEl.innerText = NETWORKS[currentNetwork].name;
+
+  updateNetworkButtons();
+
+  await Promise.all([
+    loadBalance(wallet),
+    autoDetectTokens(wallet)
+  ]);
+
+  calculatePortfolioValue();
+}
+
+/* ==========================================
+          ETH BALANCE + PRICE
+========================================== */
+async function loadBalance(wallet) {
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    const balance = await provider.getBalance(wallet);
+    const eth = ethers.utils.formatEther(balance);
+
+    const ethBalanceEl = document.getElementById("ethBalance");
+    if (ethBalanceEl) ethBalanceEl.innerText = eth + " ETH";
+
+    // ETH PRICE
+    let price = 0;
+    const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
+    const j = await r.json();
+    price = j?.ethereum?.usd || 0;
+
+    const ethPriceEl = document.getElementById("ethPrice");
+    if (ethPriceEl) {
+      ethPriceEl.innerText = price ? "$" + price.toLocaleString() : "—";
     }
+
+    // Store for portfolio
+    window.dashboardEthValue = { balance: parseFloat(eth), price };
+
+  } catch (e) {
+    console.error("Balance error:", e);
+    const ethPriceEl = document.getElementById("ethPrice");
+    if (ethPriceEl) ethPriceEl.innerText = 'ERROR';
   }
+}
 
-  /* ---------- load tokens across multiple chains via Moralis ---------- */
-  async function loadAllTokensAcrossChains(addr) {
-    // will collect { chain, token_address, name, symbol, balance, decimals, logo, usd }
-    const aggregated = [];
-    for (let chain of CHAINS) {
-      try {
-        const url = `https://deep-index.moralis.io/api/v2/${addr}/erc20?chain=${chain}&format=decimal`;
-        const resp = await fetch(url, {
-          headers: { "X-API-Key": MORALIS_API }
-        });
-        if (!resp.ok) {
-          console.warn("Moralis chain fetch failed:", chain, resp.status);
-          continue;
-        }
-        const items = await resp.json(); // array of tokens for this chain
-        // Each item typically has: token_address, name, symbol, balance (string), decimals, logo, usdPrice (maybe)
-        for (let it of items) {
-          // normalize fields; Moralis responses vary a bit
-          const token = {
-            chain,
-            token_address: it.token_address || it.contract_address || it.tokenAddress,
-            name: it.name || it.contract_name || it.symbol || "Unknown",
-            symbol: it.symbol || it.contract_ticker_symbol || "TKN",
-            balance: Number(it.balance ?? it.balance_decimal ?? 0),
-            // if format=decimal not supported, try fallback: parse raw balance with decimals
-            decimals: Number(it.decimals ?? it.contract_decimals ?? (it.decimals ? it.decimals : 18)),
-            logo: it.logo || it.logo_url || it.thumbnail || "",
-            usd: (it.usdPrice ?? it.quote ?? it.quote_rate ?? it.usd_value ?? null)
-          };
+/* ==========================================
+          TOKEN AUTO DETECTION
+========================================== */
+const ERC20_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)"
+];
 
-          // if balance is raw (not decimal) and decimals present, try convert:
-          if (token.balance && token.balance > Math.pow(10, 36)) {
-            // likely raw integer; convert
-            token.balance = token.balance / Math.pow(10, token.decimals);
-          }
+async function autoDetectTokens(wallet) {
+  const tbody = document.getElementById("tokens");
+  if (!tbody) return;
+  
+  tbody.innerHTML = `<tr><td colspan='4'>Detecting tokens...</td></tr>`;
 
-          // skip zero balances
-          if (!token.balance || Number(token.balance) === 0) continue;
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const tokenList = NETWORKS[currentNetwork].tokens;
 
-          // Try to fill logo if missing (only for ethereum tokens we attempt CoinGecko)
-          if (!token.logo && chain === "eth") {
-            try {
-              const cg = await fetch(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${token.token_address}`);
-              if (cg.ok) {
-                const j = await cg.json();
-                token.logo = j.image?.small || j.image?.thumb || "";
-              }
-            } catch (e) {
-              // ignore
-            }
-          }
+  let rows = "";
+  let found = false;
+  window.tokenValues = [];
 
-          // Try to get USD price if not present (CoinGecko fallback for Ethereum)
-          if ((!token.usd || token.usd === null) && chain === "eth") {
-            try {
-              const cgPrice = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${token.token_address}&vs_currencies=usd`);
-              const pjson = await cgPrice.json();
-              const pkey = Object.keys(pjson)[0];
-              if (pkey && pjson[pkey] && pjson[pkey].usd) {
-                token.usd = Number(pjson[pkey].usd) * Number(token.balance);
-              }
-            } catch (e) {
-              // ignore
-            }
-          } else if (token.usd) {
-            // if usd is per token or total? sometimes API gives per-token price, sometimes total.
-            // Heuristic: if usd > balance*1e6 assume it's total; else assume per-token price and convert
-            if (Number(token.usd) > 0 && Number(token.usd) < 1e6 && Number(token.usd) < Number(token.balance)) {
-              // treat as price-per-token -> convert
-              token.usd = Number(token.usd) * Number(token.balance);
-            } else {
-              // assume given usd is total already - keep as is
-              token.usd = Number(token.usd);
-            }
-          }
+  for (const tokenAddr of tokenList) {
+    try {
+      const contract = new ethers.Contract(tokenAddr, ERC20_ABI, provider);
+      const raw = await contract.balanceOf(wallet);
 
-          // push
-          aggregated.push(token);
-        }
-      } catch (e) {
-        console.warn("Error fetching tokens for chain", chain, e);
-        continue;
+      if (raw.isZero()) continue;
+
+      found = true;
+
+      const decimals = await contract.decimals();
+      const symbol = await contract.symbol();
+      const bal = Number(ethers.utils.formatUnits(raw, decimals));
+
+      // Get price (only for mainnet)
+      let price = 0;
+      if (currentNetwork === "mainnet") {
+        const r = await fetch(`https://coins.llama.fi/prices/current/ethereum:${tokenAddr}`);
+        const j = await r.json();
+        price = j?.coins?.[`ethereum:${tokenAddr}`]?.price || 0;
       }
-    }
 
-    // optional: sort tokens by USD desc (if available), else by balance
-    aggregated.sort((a,b) => (b.usd || 0) - (a.usd || 0));
-    return aggregated;
-  }
+      const usd = bal * price;
+      window.tokenValues.push(usd);
 
-  /* ---------- Render token table ---------- */
-  function renderTokenTable(items) {
-    if (!items || items.length === 0) {
-      tokensEl.innerHTML = "<div class='muted'>No tokens found on the selected chains.</div>";
-      return;
-    }
-
-    let html = `
-      <table>
-        <thead>
-          <tr>
-            <th>Logo</th>
-            <th>Name</th>
-            <th>Symbol</th>
-            <th>Chain</th>
-            <th style="text-align:right">Balance</th>
-            <th style="text-align:right">Value (USD)</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    items.forEach(t => {
-      const logo = t.logo && t.logo.length ? t.logo : "https://via.placeholder.com/34?text=•";
-      const balanceStr = Number(t.balance).toLocaleString(undefined, { maximumFractionDigits: 6 });
-      const usdStr = t.usd ? `$${Number(t.usd).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "—";
-
-      html += `
+      rows += `
         <tr>
-          <td><img class="token-logo" src="${logo}" alt="${t.symbol}" onerror="this.src='https://via.placeholder.com/34?text=•'"></td>
-          <td>${escapeHtml(t.name)}</td>
-          <td>${escapeHtml(t.symbol)}</td>
-          <td>${escapeHtml(t.chain)}</td>
-          <td style="text-align:right">${balanceStr}</td>
-          <td style="text-align:right">${usdStr}</td>
+          <td>${symbol}</td>
+          <td>${bal.toLocaleString()}</td>
+          <td>${price ? "$" + usd.toFixed(2) : "—"}</td>
+          <td>${currentNetwork === "mainnet" ? "Ethereum" : "Testnet"}</td>
         </tr>
       `;
-    });
 
-    html += "</tbody></table>";
-    tokensEl.innerHTML = html;
+    } catch (e) {
+      console.warn("Token scan error:", tokenAddr, e);
+    }
   }
 
-  /* safe simple HTML escape */
-  function escapeHtml(s) {
-    return String(s)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;");
+  tbody.innerHTML = found
+    ? rows
+    : `<tr><td colspan="4">No tokens found on ${NETWORKS[currentNetwork].name}.</td></tr>`;
+}
+
+/* ==========================================
+         PORTFOLIO CALCULATION
+========================================== */
+function calculatePortfolioValue() {
+  const eth = window.dashboardEthValue?.balance || 0;
+  const price = window.dashboardEthValue?.price || 0;
+
+  const ethValue = eth * price;
+  const tokenValue = window.tokenValues?.reduce((a, b) => a + b, 0) || 0;
+
+  const portfolioEl = document.getElementById("portfolioValue");
+  if (portfolioEl) {
+    portfolioEl.innerText =
+      "$" + (ethValue + tokenValue).toLocaleString(undefined, {
+        maximumFractionDigits: 2
+      });
   }
+}
+
+/* ==========================================
+                LOGOUT - FIXED
+========================================== */
+function logoutWallet() {
+  console.log("Logging out...");
+  
+  // Clear wallet data from localStorage
+  localStorage.removeItem("wallet");
+  
+  // Clear session storage
+  sessionStorage.clear();
+  
+  // Clear all cached data
+  window.dashboardEthValue = null;
+  window.tokenValues = null;
+  
+  console.log("Wallet disconnected, redirecting to index.html");
+  
+  // Force immediate redirect
+  window.location.replace("index.html");
 }
