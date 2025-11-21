@@ -300,15 +300,22 @@ async function fetchTokenTransactions(wallet) {
   try {
     console.log("📊 Fetching token transactions from Moralis...");
     
-    // Get API key from window object (injected by Vercel)
-    const MORALIS_API_KEY = window.__MORALIS_API_KEY__ || localStorage.getItem("moralis_key");
+    // For now, use a simple approach - you'll add API key via a config
+    // First, check if API key is stored anywhere
+    let MORALIS_API_KEY = null;
+    
+    // Try multiple sources
+    if (window.__MORALIS_API_KEY__) {
+      MORALIS_API_KEY = window.__MORALIS_API_KEY__;
+    } else if (typeof MORALIS_API_KEY_CONFIG !== 'undefined') {
+      MORALIS_API_KEY = MORALIS_API_KEY_CONFIG;
+    }
     
     if (!MORALIS_API_KEY) {
       console.error("❌ Moralis API key not configured");
-      console.log("⚠️ Make sure you:");
-      console.log("1. Added MORALIS_API_KEY to Vercel environment variables");
-      console.log("2. Redeployed your project");
-      console.log("3. Hard refresh the page (Ctrl+Shift+R)");
+      console.log("⚠️ IMPORTANT: You need to add your Moralis API key");
+      console.log("Add this line to the TOP of your dashboard.html before other scripts:");
+      console.log("<script>window.__MORALIS_API_KEY__ = 'your_moralis_api_key_here';</script>");
       return null;
     }
 
@@ -342,7 +349,19 @@ async function fetchTokenTransactions(wallet) {
 ========================================== */
 async function fetchTokenTransactionHistory(wallet, tokenAddress) {
   try {
-    const MORALIS_API_KEY = "YOUR_MORALIS_API_KEY_HERE";
+    // Get API key from window object
+    let MORALIS_API_KEY = null;
+    
+    if (window.__MORALIS_API_KEY__) {
+      MORALIS_API_KEY = window.__MORALIS_API_KEY__;
+    } else if (typeof MORALIS_API_KEY_CONFIG !== 'undefined') {
+      MORALIS_API_KEY = MORALIS_API_KEY_CONFIG;
+    }
+    
+    if (!MORALIS_API_KEY) {
+      console.error("❌ Moralis API key not configured in fetchTokenTransactionHistory");
+      return [];
+    }
     
     const response = await fetch(
       `https://deep-index.moralis.io/api/v2/erc20/${tokenAddress}/transfers?address=${wallet}&chain=eth&limit=100`,
