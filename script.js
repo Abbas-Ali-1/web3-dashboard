@@ -300,16 +300,15 @@ async function fetchTokenTransactions(wallet) {
   try {
     console.log("📊 Fetching token transactions from Moralis...");
     
-    // In Vercel, environment variables are injected with PUBLIC_ prefix for frontend
-    // You need to redeploy after adding env vars to Vercel
-    const MORALIS_API_KEY = "__MORALIS_API_KEY__";
+    // Get API key from window object (injected by Vercel)
+    const MORALIS_API_KEY = window.__MORALIS_API_KEY__ || localStorage.getItem("moralis_key");
     
-    if (!MORALIS_API_KEY || MORALIS_API_KEY === "__MORALIS_API_KEY__") {
+    if (!MORALIS_API_KEY) {
       console.error("❌ Moralis API key not configured");
-      console.log("⚠️ Instructions:");
-      console.log("1. Go to Vercel project settings");
-      console.log("2. Add Environment Variable: MORALIS_API_KEY = your_api_key");
-      console.log("3. Redeploy your project");
+      console.log("⚠️ Make sure you:");
+      console.log("1. Added MORALIS_API_KEY to Vercel environment variables");
+      console.log("2. Redeployed your project");
+      console.log("3. Hard refresh the page (Ctrl+Shift+R)");
       return null;
     }
 
