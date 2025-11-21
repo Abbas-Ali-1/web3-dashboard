@@ -1,0 +1,5 @@
+{
+  "env": {
+    "MORALIS_API_KEY": "@moralis_api_key"
+  }
+}
