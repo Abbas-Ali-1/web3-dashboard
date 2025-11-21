@@ -57,7 +57,7 @@
 
           <!-- Token List (table) -->
           <div class="card glass wide">
-              <h2>Your Tokens</h2>
+              <h2>Your Tokens (Real-time)</h2>
 
               <table class="token-table" style="width: 100%; border-collapse: collapse;">
                   <thead>
@@ -79,6 +79,39 @@
                   </tbody>
               </table>
 
+          </div>
+
+          <!-- Token Tracking with Average Buying Price -->
+          <div class="card glass wide">
+              <h2>Token Tracking (Average Buying Price & P&L)</h2>
+
+              <table class="token-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
+                          <th style="padding: 12px; text-align: left;">Token</th>
+                          <th style="padding: 12px; text-align: left;">Amount</th>
+                          <th style="padding: 12px; text-align: left;">Avg. Buy Price</th>
+                          <th style="padding: 12px; text-align: left;">Current Price</th>
+                          <th style="padding: 12px; text-align: left;">Total Spent</th>
+                          <th style="padding: 12px; text-align: left;">Current Value</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss ($)</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss (%)</th>
+                      </tr>
+                  </thead>
+
+                  <tbody id="tokenTracking">
+                      <tr>
+                          <td colspan="8" style="padding: 20px; text-align: center;">Loading token history...</td>
+                      </tr>
+                  </tbody>
+              </table>
+
+          </div>
+
+          <!-- Portfolio Summary -->
+          <div class="card glass wide" id="portfolioSummary" style="margin-top: 20px;">
+              <h3>📊 Portfolio Summary</h3>
+              <p style="color: #999;">Calculating...</p>
           </div>
 
       </div>
