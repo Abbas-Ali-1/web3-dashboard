@@ -17,8 +17,7 @@
       </nav>
 
       <!-- Logout button -->
-      <!-- Replace this line in your dashboard.html -->
-    <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+      <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
   </aside>
 
   <!-- Main Content -->
@@ -54,26 +53,28 @@
               <h3>ETH Balance</h3>
               <p id="ethBalance" class="big-info">Loading...</p>
               <p id="ethPrice" class="info small"></p>
-              
           </div>
 
           <!-- Token List (table) -->
           <div class="card glass wide">
               <h2>Your Tokens</h2>
 
-              <table class="token-table">
+              <table class="token-table" style="width: 100%; border-collapse: collapse;">
                   <thead>
-                      <tr>
-                          <th>Token</th>
-                          <th>Amount</th>
-                          <th>USD Value</th>
-                          <th>Chain</th>
+                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
+                          <th style="padding: 12px; text-align: left;">Token</th>
+                          <th style="padding: 12px; text-align: left;">Amount</th>
+                          <th style="padding: 12px; text-align: left;">Avg Price</th>
+                          <th style="padding: 12px; text-align: left;">Current Price</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss</th>
+                          <th style="padding: 12px; text-align: left;">Current Value</th>
+                          <th style="padding: 12px; text-align: left;">Action</th>
                       </tr>
                   </thead>
 
                   <tbody id="tokens">
                       <tr>
-                          <td colspan="4">Loading...</td>
+                          <td colspan="7" style="padding: 20px; text-align: center;">Loading...</td>
                       </tr>
                   </tbody>
               </table>
