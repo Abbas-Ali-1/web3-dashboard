@@ -4,761 +4,138 @@
   <meta charset="utf-8" />
   <title>Web3 Dashboard</title>
   
+  <!-- Add your NEW Moralis API key here (after you regenerate it) -->
   <script>
-    window.__MORALIS_API_KEY__ = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImUwZDAzNGI1LWQxZjktNDkzZC1iMWVjLTgyZmNkMTY1NmE5NiIsIm9yZ0lkIjoiNDgxODI2IiwidXNlcklkIjoiNDk1Njk4IiwidHlwZSI6IlBST0pFQ1QiLCJ0eXBlSWQiOiIyNjJkNTUxZS1iNDA4LTQ0ZmEtYTU1MS1mYTNiY2U0ZDk3NWEiLCJpYXQiOjE3NjM3Mjc2MTQsImV4cCI6NDkxOTQ4NzYxNH0.mgx_N-9l4QvIYztaOxT-HGTQfAkMwUhk1n-lTRsaTOY';
+    window.__MORALIS_API_KEY__ = 'PASTE_YOUR_NEW_API_KEY_HERE';
   </script>
   
-  <style>
-    /* Global Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #0a0f24, #131b3a, #0a0f24);
-      color: #fff;
-      min-height: 100vh;
-    }
-
-    /* Search Bar Section */
-    .search-section {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 20px 40px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .search-container {
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .search-input {
-      flex: 1;
-      padding: 14px 20px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px solid rgba(77, 210, 255, 0.3);
-      border-radius: 12px;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    .search-input:focus {
-      border-color: #4dd2ff;
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .search-input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .search-btn {
-      padding: 14px 30px;
-      background: #4dd2ff;
-      border: none;
-      border-radius: 12px;
-      color: #000;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 15px;
-    }
-
-    .search-btn:hover {
-      background: #32c4f8;
-      transform: translateY(-2px);
-    }
-
-    .connect-wallet-btn {
-      padding: 14px 24px;
-      background: rgba(255, 77, 109, 0.2);
-      border: 2px solid #ff4d6d;
-      border-radius: 12px;
-      color: #ff4d6d;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    .connect-wallet-btn:hover {
-      background: #ff4d6d;
-      color: #fff;
-    }
-
-    .connect-wallet-btn.connected {
-      background: rgba(77, 210, 255, 0.2);
-      border-color: #4dd2ff;
-      color: #4dd2ff;
-    }
-
-    /* Main Content */
-    .dashboard-container {
-      padding: 40px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .page-title {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      opacity: 0.7;
-      margin-bottom: 30px;
-    }
-
-    /* Alert Settings Card */
-    .alert-card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 25px;
-      margin-bottom: 30px;
-      backdrop-filter: blur(12px);
-    }
-
-    .alert-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .alert-header h3 {
-      font-size: 20px;
-      flex: 1;
-    }
-
-    .status-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .status-badge.active {
-      background: rgba(77, 210, 255, 0.2);
-      color: #4dd2ff;
-    }
-
-    .status-badge.inactive {
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .alert-form {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
-
-    .form-group {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 13px;
-      opacity: 0.8;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 15px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .form-group input:focus {
-      border-color: #4dd2ff;
-    }
-
-    .alert-toggle-btn {
-      padding: 12px 24px;
-      background: #4dd2ff;
-      border: none;
-      border-radius: 10px;
-      color: #000;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 14px;
-    }
-
-    .alert-toggle-btn:hover {
-      background: #32c4f8;
-    }
-
-    .alert-toggle-btn.active {
-      background: #ff4d6d;
-    }
-
-    .alert-info {
-      margin-top: 15px;
-      padding: 12px;
-      background: rgba(255, 180, 0, 0.1);
-      border-left: 3px solid #ffb400;
-      border-radius: 8px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    /* Cards Grid */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 22px;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 25px;
-      backdrop-filter: blur(12px);
-    }
-
-    .card h2 {
-      font-size: 16px;
-      margin-bottom: 15px;
-      opacity: 0.8;
-    }
-
-    .card-value {
-      font-size: 28px;
-      font-weight: 600;
-      color: #4dd2ff;
-    }
-
-    .card-subtitle {
-      font-size: 13px;
-      opacity: 0.6;
-      margin-top: 8px;
-    }
-
-    /* Table Styles */
-    .table-card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 25px;
-      backdrop-filter: blur(12px);
-      overflow-x: auto;
-      margin-bottom: 30px;
-    }
-
-    .table-card h2 {
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead tr {
-      background: rgba(77, 210, 255, 0.1);
-      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-    }
-
-    th {
-      padding: 12px;
-      text-align: left;
-      font-size: 13px;
-      font-weight: 600;
-      color: #4dd2ff;
-    }
-
-    td {
-      padding: 15px 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 14px;
-    }
-
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      opacity: 0.6;
-    }
-
-    /* Network Selector */
-    .network-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .network-btn {
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      color: #fff;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 14px;
-    }
-
-    .network-btn.active {
-      background: #4dd2ff;
-      color: #000;
-      border-color: #4dd2ff;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .search-container {
-        flex-direction: column;
-      }
-
-      .dashboard-container {
-        padding: 20px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-  <!-- Search Bar Section -->
-  <div class="search-section">
-    <div class="search-container">
-      <input 
-        type="text" 
-        id="walletSearch" 
-        class="search-input" 
-        placeholder="Enter wallet address to search (0x...)"
-      />
-      <button class="search-btn" onclick="searchWallet()">🔍 Search</button>
-      <button class="connect-wallet-btn" id="connectBtn" onclick="toggleConnect()">
-        🦊 Connect Wallet
-      </button>
-    </div>
-  </div>
+<body class="dashboard-body">
 
-  <!-- Main Dashboard -->
-  <div class="dashboard-container">
-    <h1 class="page-title">Web3 Dashboard</h1>
-    <p class="subtitle" id="currentWallet">Search or connect a wallet to view data</p>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+      <h2 class="logo">Crypto<span>Hub</span></h2>
 
-    <!-- Email Alert Settings -->
-    <div class="alert-card" id="alertCard" style="display: none;">
-      <div class="alert-header">
-        <h3>📧 Transaction Alerts</h3>
-        <span class="status-badge inactive" id="alertStatus">Inactive</span>
-      </div>
-      
-      <div class="alert-form">
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="emailInput" placeholder="your@email.com" />
-        </div>
-        <button class="alert-toggle-btn" id="alertToggle" onclick="toggleAlerts()">
-          Enable Alerts
+      <nav class="menu">
+          <a class="active">Dashboard</a>
+      </nav>
+
+      <!-- Logout button -->
+      <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+      <h1 class="page-title">Your Web3 Dashboard</h1>
+
+      <!-- Network Selector -->
+      <div class="network-selector">
+        <button class="network-btn active" data-network="mainnet" onclick="switchNetwork('mainnet')">
+            🌐 Mainnet
+        </button>
+        <button class="network-btn" data-network="testnet" onclick="switchNetwork('testnet')">
+            🧪 Testnet
         </button>
       </div>
+      <h1 class="page-title">Your Web3 Dashboard</h1>
 
-      <div class="alert-info">
-        ⚠️ <strong>Important:</strong> Email alerts require a backend server to monitor transactions in real-time. 
-        The current implementation shows the UI only. To actually receive emails, you'll need to:
-        <br>• Set up a Node.js backend with cron jobs or websockets
-        <br>• Use services like Moralis Streams API or Alchemy Notify
-        <br>• Configure email sending via SendGrid, Mailgun, or Gmail API
-      </div>
-    </div>
-
-    <!-- Network Selector -->
-    <div class="network-selector">
-      <button class="network-btn active" data-network="mainnet" onclick="switchNetwork('mainnet')">
-        🌐 Mainnet
-      </button>
-      <button class="network-btn" data-network="testnet" onclick="switchNetwork('testnet')">
-        🧪 Testnet
-      </button>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid">
-      <div class="card">
-        <h2>ETH Balance</h2>
-        <div class="card-value" id="ethBalance">—</div>
-        <div class="card-subtitle" id="ethPrice">Loading...</div>
+      <!-- Wallet Search Section -->
+      <div class="wallet-search-section">
+        <input 
+          type="text" 
+          id="walletSearchInput" 
+          class="wallet-search-input" 
+          placeholder="Enter wallet address to search (0x...)"
+        />
+        <button id="walletSearchBtn" class="wallet-search-btn">🔍 Search Wallet</button>
       </div>
 
-      <div class="card">
-        <h2>Portfolio Value</h2>
-        <div class="card-value" id="portfolioValue">—</div>
-        <div class="card-subtitle">Total value in USD</div>
+      <!-- Network Selector -->
+      <div class="network-selector">
+
+      <p class="current-network">Connected to: <strong id="networkName">Mainnet</strong></p>
+
+      <div class="grid">
+
+          <!-- Wallet Card -->
+          <div class="card glass">
+              <h2>Wallet Address</h2>
+              <p id="wallet" class="info">Loading...</p>
+          </div>
+
+          <!-- Balance Card -->
+          <div class="card glass">
+              <h2>Portfolio Value</h2>
+              <p id="portfolioValue" class="info small">loading...</p>
+              <br>
+              <h3>ETH Balance</h3>
+              <p id="ethBalance" class="big-info">Loading...</p>
+              <p id="ethPrice" class="info small"></p>
+          </div>
+
+          <!-- Token List (table) -->
+          <div class="card glass wide">
+              <h2>Your Tokens (Real-time)</h2>
+
+              <table class="token-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
+                          <th style="padding: 12px; text-align: left;">Token</th>
+                          <th style="padding: 12px; text-align: left;">Amount</th>
+                          <th style="padding: 12px; text-align: left;">Avg Price</th>
+                          <th style="padding: 12px; text-align: left;">Current Price</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss</th>
+                          <th style="padding: 12px; text-align: left;">Current Value</th>
+                          <th style="padding: 12px; text-align: left;">Action</th>
+                      </tr>
+                  </thead>
+
+                  <tbody id="tokens">
+                      <tr>
+                          <td colspan="7" style="padding: 20px; text-align: center;">Loading...</td>
+                      </tr>
+                  </tbody>
+              </table>
+
+          </div>
+          
+
+          <!-- Token Tracking with Average Buying Price -->
+          <div class="card glass wide">
+              <h2>Token Tracking (Average Buying Price & P&L)</h2>
+
+              <table class="token-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
+                          <th style="padding: 12px; text-align: left;">Token</th>
+                          <th style="padding: 12px; text-align: left;">Amount</th>
+                          <th style="padding: 12px; text-align: left;">Avg. Buy Price</th>
+                          <th style="padding: 12px; text-align: left;">Current Price</th>
+                          <th style="padding: 12px; text-align: left;">Total Spent</th>
+                          <th style="padding: 12px; text-align: left;">Current Value</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss ($)</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss (%)</th>
+                      </tr>
+                  </thead>
+
+                  <tbody id="tokenTracking">
+                      <tr>
+                          <td colspan="8" style="padding: 20px; text-align: center;">Loading token history...</td>
+                      </tr>
+                  </tbody>
+              </table>
+
+          </div>
+
       </div>
 
-      <div class="card">
-        <h2>Active Tokens</h2>
-        <div class="card-value" id="tokenCount">—</div>
-        <div class="card-subtitle">Tokens with balance > 0</div>
-      </div>
-    </div>
-
-    <!-- Token Holdings Table -->
-    <div class="table-card">
-      <h2>Token Holdings</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Token</th>
-            <th>Balance</th>
-            <th>Price</th>
-            <th>Value (USD)</th>
-          </tr>
-        </thead>
-        <tbody id="tokensTable">
-          <tr>
-            <td colspan="4" class="loading">Search or connect a wallet to view tokens</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Transaction History Table -->
-    <div class="table-card">
-      <h2>Profit/Loss Tracking</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Token</th>
-            <th>Amount</th>
-            <th>Avg Buy Price</th>
-            <th>Current Price</th>
-            <th>Total Spent</th>
-            <th>Current Value</th>
-            <th>P&L ($)</th>
-            <th>P&L (%)</th>
-          </tr>
-        </thead>
-        <tbody id="trackingTable">
-          <tr>
-            <td colspan="8" class="loading">Transaction history will appear here</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
+  <!-- Order is VERY important -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  <script>
-    // Configuration
-    const NETWORKS = {
-      mainnet: {
-        name: "Mainnet",
-        chainIds: ["0x1"],
-        tokens: [
-          "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2", // WETH
-          "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
-          "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
-          "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
-          "0x514910771AF9Ca656af840dff83E8264EcF986CA", // LINK
-          "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"  // WBTC
-        ]
-      },
-      testnet: {
-        name: "Testnet",
-        chainIds: ["0xaa36a7"],
-        tokens: []
-      }
-    };
-
-    let currentNetwork = "mainnet";
-    let currentWallet = null;
-    let connectedWallet = null;
-    let alertsEnabled = false;
-
-    const ERC20_ABI = [
-      "function balanceOf(address) view returns (uint256)",
-      "function decimals() view returns (uint8)",
-      "function symbol() view returns (string)"
-    ];
-
-    // Search Wallet Function
-    async function searchWallet() {
-      const searchInput = document.getElementById('walletSearch');
-      let address = searchInput.value.trim();
-
-      if (!address) {
-        alert('Please enter a wallet address');
-        return;
-      }
-
-      // Validate Ethereum address
-      if (!ethers.utils.isAddress(address)) {
-        alert('Invalid Ethereum address');
-        return;
-      }
-
-      currentWallet = address;
-      document.getElementById('currentWallet').textContent = `Viewing wallet: ${address}`;
-      
-      await loadWalletData(address);
-    }
-
-    // Connect/Disconnect Wallet
-    async function toggleConnect() {
-      const btn = document.getElementById('connectBtn');
-      
-      if (connectedWallet) {
-        // Disconnect
-        connectedWallet = null;
-        currentWallet = null;
-        btn.textContent = '🦊 Connect Wallet';
-        btn.classList.remove('connected');
-        document.getElementById('alertCard').style.display = 'none';
-        document.getElementById('currentWallet').textContent = 'Search or connect a wallet to view data';
-        clearDashboard();
-      } else {
-        // Connect
-        if (!window.ethereum) {
-          alert('MetaMask not found! Please install MetaMask.');
-          return;
-        }
-
-        try {
-          const accounts = await window.ethereum.request({ 
-            method: "eth_requestAccounts" 
-          });
-          
-          connectedWallet = accounts[0];
-          currentWallet = connectedWallet;
-          
-          btn.textContent = `✓ ${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}`;
-          btn.classList.add('connected');
-          
-          document.getElementById('walletSearch').value = connectedWallet;
-          document.getElementById('currentWallet').textContent = `Connected wallet: ${connectedWallet}`;
-          document.getElementById('alertCard').style.display = 'block';
-          
-          await loadWalletData(connectedWallet);
-        } catch (err) {
-          console.error('Connection error:', err);
-          alert('Failed to connect wallet');
-        }
-      }
-    }
-
-    // Load Wallet Data
-    async function loadWalletData(wallet) {
-      try {
-        await Promise.all([
-          loadEthBalance(wallet),
-          loadTokens(wallet),
-          loadTransactionHistory(wallet)
-        ]);
-      } catch (error) {
-        console.error('Error loading wallet data:', error);
-      }
-    }
-
-    // Load ETH Balance
-    async function loadEthBalance(wallet) {
-      try {
-        const provider = new ethers.providers.JsonRpcProvider('https://eth.llamarpc.com');
-        const balance = await provider.getBalance(wallet);
-        const eth = ethers.utils.formatEther(balance);
-
-        document.getElementById('ethBalance').textContent = parseFloat(eth).toFixed(4) + ' ETH';
-
-        // Get ETH price
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-        const data = await response.json();
-        const price = data?.ethereum?.usd || 0;
-
-        document.getElementById('ethPrice').textContent = `$${price.toLocaleString()}`;
-
-        return { balance: parseFloat(eth), price };
-      } catch (error) {
-        console.error('Error loading balance:', error);
-        document.getElementById('ethBalance').textContent = 'Error';
-        return { balance: 0, price: 0 };
-      }
-    }
-
-    // Load Tokens
-    async function loadTokens(wallet) {
-      const tbody = document.getElementById('tokensTable');
-      tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading tokens...</td></tr>';
-
-      try {
-        const provider = new ethers.providers.JsonRpcProvider('https://eth.llamarpc.com');
-        const tokenList = NETWORKS[currentNetwork].tokens;
-
-        let rows = '';
-        let tokenCount = 0;
-        let totalValue = 0;
-
-        for (const tokenAddr of tokenList) {
-          try {
-            const contract = new ethers.Contract(tokenAddr, ERC20_ABI, provider);
-            const raw = await contract.balanceOf(wallet);
-
-            if (raw.isZero()) continue;
-
-            const decimals = await contract.decimals();
-            const symbol = await contract.symbol();
-            const balance = parseFloat(ethers.utils.formatUnits(raw, decimals));
-
-            let price = 0;
-            if (currentNetwork === 'mainnet') {
-              const priceResponse = await fetch(`https://coins.llama.fi/prices/current/ethereum:${tokenAddr}`);
-              const priceData = await priceResponse.json();
-              price = priceData?.coins?.[`ethereum:${tokenAddr}`]?.price || 0;
-            }
-
-            const value = balance * price;
-            totalValue += value;
-            tokenCount++;
-
-            rows += `
-              <tr>
-                <td>${symbol}</td>
-                <td>${balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</td>
-                <td>${price ? '$' + price.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'}</td>
-                <td>${value ? '$' + value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'}</td>
-              </tr>
-            `;
-          } catch (err) {
-            console.warn('Token error:', err);
-          }
-        }
-
-        tbody.innerHTML = rows || '<tr><td colspan="4" class="loading">No tokens found</td></tr>';
-        document.getElementById('tokenCount').textContent = tokenCount;
-        document.getElementById('portfolioValue').textContent = '$' + totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 });
-
-      } catch (error) {
-        console.error('Error loading tokens:', error);
-        tbody.innerHTML = '<tr><td colspan="4" class="loading">Error loading tokens</td></tr>';
-      }
-    }
-
-    // Load Transaction History (Placeholder)
-    async function loadTransactionHistory(wallet) {
-      const tbody = document.getElementById('trackingTable');
-      
-      // Check for Moralis API key
-      if (!window.__MORALIS_API_KEY__ || window.__MORALIS_API_KEY__ === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImUwZDAzNGI1LWQxZjktNDkzZC1iMWVjLTgyZmNkMTY1NmE5NiIsIm9yZ0lkIjoiNDgxODI2IiwidXNlcklkIjoiNDk1Njk4IiwidHlwZSI6IlBST0pFQ1QiLCJ0eXBlSWQiOiIyNjJkNTUxZS1iNDA4LTQ0ZmEtYTU1MS1mYTNiY2U0ZDk3NWEiLCJpYXQiOjE3NjM3Mjc2MTQsImV4cCI6NDkxOTQ4NzYxNH0.mgx_N-9l4QvIYztaOxT-HGTQfAkMwUhk1n-lTRsaTOY') {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="8" style="padding: 20px; text-align: center; color: #ffb400;">
-              ⚠️ Moralis API key not configured. Transaction history requires a valid API key.<br>
-              Add your API key in the &lt;script&gt; tag at the top of this file.
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = '<tr><td colspan="8" class="loading">Loading transaction history...</td></tr>';
-
-      // Your existing Moralis implementation would go here
-      // This is just a placeholder
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="8" style="padding: 20px; text-align: center;">
-            Transaction history feature requires Moralis API integration
-          </td>
-        </tr>
-      `;
-    }
-
-    // Switch Network
-    function switchNetwork(network) {
-      currentNetwork = network;
-      document.querySelectorAll('.network-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.network === network);
-      });
-
-      if (currentWallet) {
-        loadWalletData(currentWallet);
-      }
-    }
-
-    // Toggle Email Alerts
-    function toggleAlerts() {
-      const btn = document.getElementById('alertToggle');
-      const statusBadge = document.getElementById('alertStatus');
-      const emailInput = document.getElementById('emailInput');
-
-      if (!alertsEnabled) {
-        const email = emailInput.value.trim();
-        if (!email || !email.includes('@')) {
-          alert('Please enter a valid email address');
-          return;
-        }
-
-        alertsEnabled = true;
-        btn.textContent = 'Disable Alerts';
-        btn.classList.add('active');
-        statusBadge.textContent = 'Active';
-        statusBadge.classList.remove('inactive');
-        statusBadge.classList.add('active');
-        
-        alert(`Alerts UI enabled for ${email}. Note: Backend server required for actual email delivery.`);
-      } else {
-        alertsEnabled = false;
-        btn.textContent = 'Enable Alerts';
-        btn.classList.remove('active');
-        statusBadge.textContent = 'Inactive';
-        statusBadge.classList.remove('active');
-        statusBadge.classList.add('inactive');
-      }
-    }
-
-    // Clear Dashboard
-    function clearDashboard() {
-      document.getElementById('ethBalance').textContent = '—';
-      document.getElementById('ethPrice').textContent = 'Loading...';
-      document.getElementById('portfolioValue').textContent = '—';
-      document.getElementById('tokenCount').textContent = '—';
-      document.getElementById('tokensTable').innerHTML = '<tr><td colspan="4" class="loading">Search or connect a wallet to view tokens</td></tr>';
-      document.getElementById('trackingTable').innerHTML = '<tr><td colspan="8" class="loading">Transaction history will appear here</td></tr>';
-    }
-
-    // Auto-connect if previously connected
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedWallet = localStorage.getItem('connectedWallet');
-      if (savedWallet && window.ethereum) {
-        // Optional: Auto-reconnect
-        // toggleConnect();
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
