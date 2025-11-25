@@ -3,12 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <title>Web3 Dashboard</title>
-  
-  <!-- Add your NEW Moralis API key here (after you regenerate it) -->
-  <script>
-    window.__MORALIS_API_KEY__ = 'PASTE_YOUR_NEW_API_KEY_HERE';
-  </script>
-  
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -31,6 +25,20 @@
 
       <h1 class="page-title">Your Web3 Dashboard</h1>
 
+      <!-- Search Bar (Center Top) -->
+      <div class="search-container">
+        <input 
+          type="text" 
+          id="searchAddress" 
+          class="search-input" 
+          placeholder="Enter wallet address to view transactions..."
+        />
+        <button id="searchBtn" class="search-btn">🔍 Search</button>
+      </div>
+
+      <!-- Transaction Results (Hidden by default) -->
+      <div id="transactionResults" class="transaction-results card glass"></div>
+
       <!-- Network Selector -->
       <div class="network-selector">
         <button class="network-btn active" data-network="mainnet" onclick="switchNetwork('mainnet')">
@@ -40,21 +48,6 @@
             🧪 Testnet
         </button>
       </div>
-      <h1 class="page-title">Your Web3 Dashboard</h1>
-
-      <!-- Wallet Search Section -->
-      <div class="wallet-search-section">
-        <input 
-          type="text" 
-          id="walletSearchInput" 
-          class="wallet-search-input" 
-          placeholder="Enter wallet address to search (0x...)"
-        />
-        <button id="walletSearchBtn" class="wallet-search-btn">🔍 Search Wallet</button>
-      </div>
-
-      <!-- Network Selector -->
-      <div class="network-selector">
 
       <p class="current-network">Connected to: <strong id="networkName">Mainnet</strong></p>
 
@@ -74,56 +67,26 @@
               <h3>ETH Balance</h3>
               <p id="ethBalance" class="big-info">Loading...</p>
               <p id="ethPrice" class="info small"></p>
+              
           </div>
 
           <!-- Token List (table) -->
           <div class="card glass wide">
-              <h2>Your Tokens (Real-time)</h2>
+              <h2>Your Tokens</h2>
 
-              <table class="token-table" style="width: 100%; border-collapse: collapse;">
+              <table class="token-table">
                   <thead>
-                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
-                          <th style="padding: 12px; text-align: left;">Token</th>
-                          <th style="padding: 12px; text-align: left;">Amount</th>
-                          <th style="padding: 12px; text-align: left;">Avg Price</th>
-                          <th style="padding: 12px; text-align: left;">Current Price</th>
-                          <th style="padding: 12px; text-align: left;">Profit/Loss</th>
-                          <th style="padding: 12px; text-align: left;">Current Value</th>
-                          <th style="padding: 12px; text-align: left;">Action</th>
+                      <tr>
+                          <th>Token</th>
+                          <th>Amount</th>
+                          <th>USD Value</th>
+                          <th>Chain</th>
                       </tr>
                   </thead>
 
                   <tbody id="tokens">
                       <tr>
-                          <td colspan="7" style="padding: 20px; text-align: center;">Loading...</td>
-                      </tr>
-                  </tbody>
-              </table>
-
-          </div>
-          
-
-          <!-- Token Tracking with Average Buying Price -->
-          <div class="card glass wide">
-              <h2>Token Tracking (Average Buying Price & P&L)</h2>
-
-              <table class="token-table" style="width: 100%; border-collapse: collapse;">
-                  <thead>
-                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
-                          <th style="padding: 12px; text-align: left;">Token</th>
-                          <th style="padding: 12px; text-align: left;">Amount</th>
-                          <th style="padding: 12px; text-align: left;">Avg. Buy Price</th>
-                          <th style="padding: 12px; text-align: left;">Current Price</th>
-                          <th style="padding: 12px; text-align: left;">Total Spent</th>
-                          <th style="padding: 12px; text-align: left;">Current Value</th>
-                          <th style="padding: 12px; text-align: left;">Profit/Loss ($)</th>
-                          <th style="padding: 12px; text-align: left;">Profit/Loss (%)</th>
-                      </tr>
-                  </thead>
-
-                  <tbody id="tokenTracking">
-                      <tr>
-                          <td colspan="8" style="padding: 20px; text-align: center;">Loading token history...</td>
+                          <td colspan="4">Loading...</td>
                       </tr>
                   </tbody>
               </table>
