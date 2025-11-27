@@ -274,3 +274,19 @@ th{padding-right: 300px;
     margin-bottom: 30px;
     padding-right: 400px; /* Give space for the buttons */
 }
+
+#searchAddress{
+    width: 22%;
+    padding: 10px;
+    padding-top: 20px;
+    border-radius: 8px;
+    margin-left: 32%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 16px;
+}
+
+#title2{
+    margin-left: 37%;
+}

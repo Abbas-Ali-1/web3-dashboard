@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <title>Web3 Dashboard</title>
   
-  <!-- Add your NEW Moralis API key here (after you regenerate it) -->
+  <!-- NEW Etherscan + Price API config -->
   <script>
-    window.__MORALIS_API_KEY__ = 'PASTE_YOUR_NEW_API_KEY_HERE';
+    window.__ETHERSCAN_API_KEY__ = "29WB2GZD1G2MGRVZ54JB474DNR3SA9J7MY";
+    window.__PRICE_API__ = "https://api.dexscreener.io/latest/dex/tokens/"; 
   </script>
-  
+
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -26,10 +27,32 @@
       <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
   </aside>
 
+
   <!-- Main Content -->
   <div class="main-content">
+    <div style="margin-top: 0px;">
+        <h2 id="title2">Search Wallet Transactions</h2>
 
-      <h1 class="page-title">Your Web3 Dashboard</h1>
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+            
+            <input 
+                id="searchAddress"
+                type="text" 
+                placeholder="Enter wallet address..." 
+                style="padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;">
+            
+            <button 
+                id="searchBtn"
+                onclick="searchWalletTransactions()" 
+                style="padding: 12px 18px; border-radius: 10px; background: #00DDFC; border: none; cursor: pointer; font-weight: bold; color: #000;">
+                🔍 Search
+            </button>
+        </div>
+
+        <!-- ADD THIS LINE - Very Important! -->
+        <div id="transactionResults" style="margin-top: 20px;"></div>
+      <br>
+      <h1 class="page-title">Your Web3 Dashboard</h1>     
 
       <!-- Network Selector -->
       <div class="network-selector">
@@ -61,7 +84,7 @@
               <p id="ethPrice" class="info small"></p>
           </div>
 
-          <!-- Token List (table) -->
+          <!-- Token List -->
           <div class="card glass wide">
               <h2>Your Tokens (Real-time)</h2>
 
@@ -84,41 +107,14 @@
                       </tr>
                   </tbody>
               </table>
-
           </div>
 
-          <!-- Token Tracking with Average Buying Price -->
-          <div class="card glass wide">
-              <h2>Token Tracking (Average Buying Price & P&L)</h2>
-
-              <table class="token-table" style="width: 100%; border-collapse: collapse;">
-                  <thead>
-                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
-                          <th style="padding: 12px; text-align: left;">Token</th>
-                          <th style="padding: 12px; text-align: left;">Amount</th>
-                          <th style="padding: 12px; text-align: left;">Avg. Buy Price</th>
-                          <th style="padding: 12px; text-align: left;">Current Price</th>
-                          <th style="padding: 12px; text-align: left;">Total Spent</th>
-                          <th style="padding: 12px; text-align: left;">Current Value</th>
-                          <th style="padding: 12px; text-align: left;">Profit/Loss ($)</th>
-                          <th style="padding: 12px; text-align: left;">Profit/Loss (%)</th>
-                      </tr>
-                  </thead>
-
-                  <tbody id="tokenTracking">
-                      <tr>
-                          <td colspan="8" style="padding: 20px; text-align: center;">Loading token history...</td>
-                      </tr>
-                  </tbody>
-              </table>
-
-          </div>
 
       </div>
 
   </div>
 
-  <!-- Order is VERY important -->
+  <!-- JS Order Must Remain Same -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <script src="script.js"></script>
 </body>

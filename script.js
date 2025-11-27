@@ -1,5 +1,8 @@
 console.log("script.js loaded");
 
+// Etherscan API Configuration
+const ETHERSCAN_API_KEY = "29WB2GZD1G2MGRVZ54JB474DNR3SA9J7MY"; // Replace with your Etherscan API key
+
 document.addEventListener("DOMContentLoaded", () => {
   const connectBtn = document.getElementById("myButton");
   if (connectBtn) connectBtn.addEventListener("click", connectWallet);
@@ -12,6 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
       e.stopPropagation();
       console.log("🔴 Logout button clicked!");
       logoutWallet();
+    });
+  }
+
+  // Search button listener
+  const searchBtn = document.getElementById("searchBtn");
+  if (searchBtn) {
+    searchBtn.addEventListener("click", searchWalletTransactions);
+  }
+
+  // Enter key support for search
+  const searchInput = document.getElementById("searchWalletInput");
+  if (searchInput) {
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        searchWalletTransactions();
+      }
     });
   }
 
@@ -168,8 +187,7 @@ async function loadDashboard() {
 
   await Promise.all([
     loadBalance(wallet),
-    autoDetectTokens(wallet),
-    displayTokenTracking(wallet)
+    autoDetectTokens(wallet)
   ]);
 
   calculatePortfolioValue();
@@ -220,7 +238,7 @@ async function autoDetectTokens(wallet) {
   const tbody = document.getElementById("tokens");
   if (!tbody) return;
   
-  tbody.innerHTML = `<tr><td colspan="7">Detecting tokens...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="4">Detecting tokens...</td></tr>`;
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const tokenList = NETWORKS[currentNetwork].tokens;
@@ -256,11 +274,8 @@ async function autoDetectTokens(wallet) {
         <tr>
           <td>${symbol}</td>
           <td>${bal.toLocaleString()}</td>
-          <td>—</td>
-          <td>${price ? "$" + price.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "—"}</td>
-          <td>—</td>
           <td>${price ? "$" + usd.toFixed(2) : "—"}</td>
-          <td><button class="action-btn" onclick="alert('More details coming soon')">View</button></td>
+          <td>${currentNetwork === "mainnet" ? "Ethereum" : "Testnet"}</td>
         </tr>
       `;
 
@@ -271,7 +286,7 @@ async function autoDetectTokens(wallet) {
 
   tbody.innerHTML = found
     ? rows
-    : `<tr><td colspan="7">No tokens found on ${NETWORKS[currentNetwork].name}.</td></tr>`;
+    : `<tr><td colspan="4">No tokens found on ${NETWORKS[currentNetwork].name}.</td></tr>`;
 }
 
 /* ==========================================
@@ -294,288 +309,143 @@ function calculatePortfolioValue() {
 }
 
 /* ==========================================
-     FETCH TOKEN TRANSACTIONS FROM MORALIS
+      SEARCH WALLET TRANSACTIONS (ETHERSCAN)
 ========================================== */
-async function fetchTokenTransactions(wallet) {
+async function searchWalletTransactions() {
+  const searchInput = document.getElementById("searchAddress");
+  const address = searchInput.value.trim();
+
+  if (!address) {
+    alert("Please enter a wallet address");
+    return;
+  }
+
+  // Basic validation
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    alert("Invalid Ethereum address format");
+    return;
+  }
+
+  console.log("Searching transactions for:", address);
+
+  // Show loading state
+  const resultsDiv = document.getElementById("transactionResults");
+  resultsDiv.innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <p>Loading transactions...</p>
+    </div>
+  `;
+  resultsDiv.style.display = "block";
+
   try {
-    console.log("📊 Fetching token transactions from Moralis...");
-    
-    // For now, use a simple approach - you'll add API key via a config
-    // First, check if API key is stored anywhere
-    let MORALIS_API_KEY = null;
-    
-    // Try multiple sources
-    if (window.__MORALIS_API_KEY__) {
-      MORALIS_API_KEY = window.__MORALIS_API_KEY__;
-    } else if (typeof MORALIS_API_KEY_CONFIG !== 'undefined') {
-      MORALIS_API_KEY = MORALIS_API_KEY_CONFIG;
-    }
-    
-    if (!MORALIS_API_KEY) {
-      console.error("❌ Moralis API key not configured");
-      console.log("⚠️ IMPORTANT: You need to add your Moralis API key");
-      console.log("Add this line to the TOP of your dashboard.html before other scripts:");
-      console.log("<script>window.__MORALIS_API_KEY__ = 'your_moralis_api_key_here';</script>");
-      return null;
-    }
+    // Etherscan API call - Normal transactions
+    const CHAIN_MAP = {
+      mainnet: { id: "1", url: "https://api.etherscan.io/v2/api" },
+      sepolia: { id: "11155111", url: "https://api-sepolia.etherscan.io/v2/api" },
+      holesky: { id: "17000", url: "https://api-holesky.etherscan.io/v2/api" }
+    };
+
+    const selected = currentNetwork === "testnet" ? CHAIN_MAP.sepolia : CHAIN_MAP.mainnet;
 
     const response = await fetch(
-      `https://deep-index.moralis.io/api/v2/${wallet}/erc20?chain=eth`,
-      {
-        method: "GET",
-        headers: {
-          "X-API-Key": MORALIS_API_KEY,
-          "accept": "application/json"
-        }
-      }
+      `${selected.url}?chainid=${selected.id}&module=account&action=txlist&address=${address}&page=1&offset=20&sort=desc&apikey=${ETHERSCAN_API_KEY}`
     );
 
-    if (!response.ok) {
-      throw new Error(`Moralis API error: ${response.status}`);
-    }
 
     const data = await response.json();
-    console.log("✓ Transactions fetched:", data);
-    
-    return data;
-  } catch (error) {
-    console.error("❌ Error fetching transactions:", error);
-    return null;
-  }
-}
+    console.log("Transaction data:", data);
 
-/* ==========================================
-   FETCH TOKEN TRANSACTION HISTORY
-========================================== */
-async function fetchTokenTransactionHistory(wallet, tokenAddress) {
-  try {
-    // Get API key from window object
-    let MORALIS_API_KEY = null;
-    
-    if (window.__MORALIS_API_KEY__) {
-      MORALIS_API_KEY = window.__MORALIS_API_KEY__;
-    } else if (typeof MORALIS_API_KEY_CONFIG !== 'undefined') {
-      MORALIS_API_KEY = MORALIS_API_KEY_CONFIG;
-    }
-    
-    if (!MORALIS_API_KEY) {
-      console.error("❌ Moralis API key not configured in fetchTokenTransactionHistory");
-      return [];
-    }
-    
-    const response = await fetch(
-      `https://deep-index.moralis.io/api/v2/erc20/${tokenAddress}/transfers?address=${wallet}&chain=eth&limit=100`,
-      {
-        method: "GET",
-        headers: {
-          "X-API-Key": MORALIS_API_KEY,
-          "accept": "application/json"
-        }
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Transfer API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    const transactions = data.result.map(tx => ({
-      amount: parseFloat(tx.value) / Math.pow(10, tx.decimals),
-      direction: tx.from_address.toLowerCase() === wallet.toLowerCase() ? "out" : "in",
-      type: tx.from_address.toLowerCase() === wallet.toLowerCase() ? "sell" : "buy",
-      timestamp: new Date(tx.block_timestamp),
-      hash: tx.transaction_hash,
-      priceAtTime: parseFloat(tx.value_decimal) || 0
-    }));
-
-    return transactions;
-  } catch (error) {
-    console.error("❌ Error fetching transaction history:", error);
-    return [];
-  }
-}
-
-/* ==========================================
-   CALCULATE AVERAGE BUYING PRICE & STATS
-========================================== */
-function calculateTokenStats(transactions, currentPrice) {
-  if (!transactions || transactions.length === 0) {
-    return null;
-  }
-
-  let totalAmount = 0;
-  let totalSpent = 0;
-  let buyTransactions = [];
-
-  transactions.forEach(tx => {
-    if (tx.type === "buy" || tx.direction === "in") {
-      const amount = parseFloat(tx.amount);
-      const price = parseFloat(tx.priceAtTime);
-      const spent = amount * price;
-
-      totalAmount += amount;
-      totalSpent += spent;
-
-      buyTransactions.push({
-        amount,
-        price,
-        spent,
-        timestamp: tx.timestamp
-      });
-    }
-  });
-
-  if (totalAmount === 0) return null;
-
-  const averageBuyingPrice = totalSpent / totalAmount;
-  const currentValue = totalAmount * currentPrice;
-  const profitLoss = currentValue - totalSpent;
-  const profitLossPercentage = (profitLoss / totalSpent) * 100;
-
-  return {
-    totalAmount,
-    totalSpent,
-    averageBuyingPrice,
-    currentPrice,
-    currentValue,
-    profitLoss,
-    profitLossPercentage,
-    buyTransactions
-  };
-}
-
-/* ==========================================
-   ANALYZE ALL TOKENS WITH TRANSACTIONS
-========================================== */
-async function analyzeAllTokens(wallet) {
-  try {
-    console.log("🔍 Analyzing all tokens with transaction history...");
-    
-    const tokenData = await fetchTokenTransactions(wallet);
-    
-    if (!tokenData || !tokenData.result) {
-      console.log("No token data found");
-      return [];
-    }
-
-    let tokenStats = [];
-
-    for (const token of tokenData.result) {
-      try {
-        const tokenAddress = token.token_address;
-        const symbol = token.symbol;
-        const currentBalance = parseFloat(token.balance) / Math.pow(10, token.decimals);
-        const currentPrice = parseFloat(token.usd_price) || 0;
-
-        const txHistory = await fetchTokenTransactionHistory(wallet, tokenAddress);
-        
-        if (txHistory && txHistory.length > 0) {
-          const stats = calculateTokenStats(txHistory, currentPrice);
-          
-          if (stats) {
-            tokenStats.push({
-              symbol,
-              tokenAddress,
-              currentBalance,
-              currentPrice,
-              ...stats
-            });
-          }
-        }
-      } catch (error) {
-        console.warn(`Error processing token ${token.symbol}:`, error);
-      }
-    }
-
-    console.log("✓ Token analysis complete:", tokenStats);
-    return tokenStats;
-  } catch (error) {
-    console.error("❌ Error analyzing tokens:", error);
-    return [];
-  }
-}
-
-/* ==========================================
-   DISPLAY TOKEN TRACKING TABLE
-========================================== */
-async function displayTokenTracking(wallet) {
-  try {
-    const tbody = document.getElementById("tokenTracking");
-    if (!tbody) {
-      console.log("⚠ tokenTracking element not found");
-      return;
-    }
-    
-    tbody.innerHTML = `<tr><td colspan="8">Analyzing tokens with transaction history...</td></tr>`;
-
-    const tokenStats = await analyzeAllTokens(wallet);
-
-    if (tokenStats.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8">No token transactions found. Moralis may not have data yet.</td></tr>`;
-      return;
-    }
-
-    let rows = "";
-    
-    tokenStats.forEach(token => {
-      const profitLossColor = token.profitLoss >= 0 ? "#4dd2ff" : "#ff4d6d";
-      const profitLossIcon = token.profitLoss >= 0 ? "📈" : "📉";
-
-      rows += `
-        <tr>
-          <td>${token.symbol}</td>
-          <td>${token.currentBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</td>
-          <td>$${token.averageBuyingPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-          <td>$${token.currentPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-          <td>$${token.totalSpent.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-          <td>$${token.currentValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-          <td style="color: ${profitLossColor}; font-weight: bold;">
-            ${profitLossIcon} $${token.profitLoss.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-          </td>
-          <td style="color: ${profitLossColor}; font-weight: bold;">
-            ${profitLossIcon} ${token.profitLossPercentage.toFixed(2)}%
-          </td>
-        </tr>
+    if (data.status === "1" && data.result) {
+      displayTransactions(data.result, address);
+    } else if (data.status === "0" && data.message === "No transactions found") {
+      resultsDiv.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <p>No transactions found for this address</p>
+        </div>
       `;
-    });
-
-    tbody.innerHTML = rows;
-    displayPortfolioSummary(tokenStats);
+    } else {
+      throw new Error(data.message || "API Error");
+    }
 
   } catch (error) {
-    console.error("❌ Error displaying token tracking:", error);
-  }
-}
-
-/* ==========================================
-   DISPLAY PORTFOLIO SUMMARY
-========================================== */
-function displayPortfolioSummary(tokenStats) {
-  const totalSpent = tokenStats.reduce((sum, t) => sum + t.totalSpent, 0);
-  const totalCurrentValue = tokenStats.reduce((sum, t) => sum + t.currentValue, 0);
-  const totalProfitLoss = totalCurrentValue - totalSpent;
-  const totalProfitLossPercentage = (totalProfitLoss / totalSpent) * 100;
-
-  console.log("📊 Portfolio Summary:");
-  console.log(`Total Spent: $${totalSpent.toLocaleString()}`);
-  console.log(`Current Value: $${totalCurrentValue.toLocaleString()}`);
-  console.log(`Profit/Loss: $${totalProfitLoss.toLocaleString()} (${totalProfitLossPercentage.toFixed(2)}%)`);
-
-  const summaryEl = document.getElementById("portfolioSummary");
-  if (summaryEl) {
-    summaryEl.innerHTML = `
-      <div style="color: #4dd2ff; font-size: 14px; line-height: 1.8;">
-        <p><strong>📊 Portfolio Summary (From Transaction History)</strong></p>
-        <p>Total Invested: $${totalSpent.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-        <p>Current Value: $${totalCurrentValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-        <p style="color: ${totalProfitLoss >= 0 ? '#4dd2ff' : '#ff4d6d'}; font-weight: bold;">
-          P&L: $${totalProfitLoss.toLocaleString(undefined, { maximumFractionDigits: 2 })} 
-          (${totalProfitLossPercentage.toFixed(2)}%)
+    console.error("Transaction fetch error:", error);
+    resultsDiv.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #ff4d6d;">
+        <p><strong>Error loading transactions</strong></p>
+        <p style="font-size: 14px; opacity: 0.8;">${error.message}</p>
+        <p style="font-size: 13px; margin-top: 10px;">
+          Get a free Etherscan API key at: 
+          <a href="https://etherscan.io/myapikey" target="_blank" style="color: #4dd2ff;">https://etherscan.io/myapikey</a>
         </p>
       </div>
     `;
   }
+}
+
+/* ==========================================
+      DISPLAY TRANSACTIONS (ETHERSCAN FORMAT)
+========================================== */ 
+function displayTransactions(transactions, address) {
+  const resultsDiv = document.getElementById("transactionResults");
+
+  if (!transactions || transactions.length === 0) {
+    resultsDiv.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <p>No transactions found for this address</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = `
+    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">Transaction History (Last ${transactions.length})</h3>
+      <button onclick="closeTransactionResults()" style="background: rgba(255,255,255,0.1); border: none; padding: 8px 15px; border-radius: 8px; color: white; cursor: pointer;">Close</button>
+    </div>
+    <p style="font-size: 13px; opacity: 0.7; margin-bottom: 20px;">Address: ${address}</p>
+    <div style="max-height: 500px; overflow-y: auto;">
+  `;
+
+  transactions.forEach((tx) => {
+    const date = new Date(parseInt(tx.timeStamp) * 1000).toLocaleString();
+    const value = parseFloat(tx.value) / 1e18; // Convert Wei to ETH
+    const isReceived = tx.to.toLowerCase() === address.toLowerCase();
+    const direction = isReceived ? "Received" : "Sent";
+    const directionColor = isReceived ? "#4dd2ff" : "#ff4d6d";
+    const isSuccess = tx.txreceipt_status === "1" || tx.isError === "0";
+
+    html += `
+      <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid ${directionColor};">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;">
+          <div>
+            <span style="color: ${directionColor}; font-weight: 600;">${direction}</span>
+            ${!isSuccess ? '<span style="color: #ff4d6d; font-size: 12px; margin-left: 10px;">❌ Failed</span>' : ''}
+          </div>
+          <span style="font-weight: 600;">${value.toFixed(6)} ETH</span>
+        </div>
+        <div style="font-size: 13px; opacity: 0.7;">
+          <p style="margin: 5px 0;">From: ${tx.from.slice(0, 10)}...${tx.from.slice(-8)}</p>
+          <p style="margin: 5px 0;">To: ${tx.to.slice(0, 10)}...${tx.to.slice(-8)}</p>
+          <p style="margin: 5px 0;">Date: ${date}</p>
+          <p style="margin: 5px 0;">Gas: ${(parseInt(tx.gasUsed) * parseInt(tx.gasPrice) / 1e18).toFixed(6)} ETH</p>
+          <p style="margin: 5px 0;">
+            <a href="https://etherscan.io/tx/${tx.hash}" target="_blank" style="color: #4dd2ff; text-decoration: none;">
+              View on Etherscan ↗
+            </a>
+          </p>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  resultsDiv.innerHTML = html;
+}
+
+function closeTransactionResults() {
+  const resultsDiv = document.getElementById("transactionResults");
+  resultsDiv.style.display = "none";
+  document.getElementById("searchAddress").value = "";
 }
 
 /* ==========================================
