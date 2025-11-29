@@ -1,5 +1,8 @@
 {
-  "env": {
-    "MORALIS_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImUwZDAzNGI1LWQxZjktNDkzZC1iMWVjLTgyZmNkMTY1NmE5NiIsIm9yZ0lkIjoiNDgxODI2IiwidXNlcklkIjoiNDk1Njk4IiwidHlwZSI6IlBST0pFQ1QiLCJ0eXBlSWQiOiIyNjJkNTUxZS1iNDA4LTQ0ZmEtYTU1MS1mYTNiY2U0ZDk3NWEiLCJpYXQiOjE3NjM3Mjc2MTQsImV4cCI6NDkxOTQ4NzYxNH0.mgx_N-9l4QvIYztaOxT-HGTQfAkMwUhk1n-lTRsaTOY"
-  }
+  "routes": [
+    {
+      "src": "/api/stream-handler",
+      "methods": ["POST"]
+    }
+  ]
 }
