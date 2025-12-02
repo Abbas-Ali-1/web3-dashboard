@@ -1,8 +1,11 @@
 {
-  "routes": [
-    {
-      "src": "/api/stream-handler",
-      "methods": ["POST"]
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
     }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/dashboard", "destination": "/public/dashboard.html" }
   ]
 }

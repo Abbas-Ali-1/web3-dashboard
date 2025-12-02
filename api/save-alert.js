@@ -1,32 +1,31 @@
 import { createClient } from "@supabase/supabase-js";
-import axios from "axios";
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method not allowed");
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-  const { wallet, email } = req.body;
+  try {
+    const { wallet, email } = req.body;
 
-  if (!wallet || !email) return res.status(400).send("Missing fields");
+    if (!wallet || !email) return res.status(400).send("Missing wallet or email");
 
-  const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-  );
+    const normalizedWallet = wallet.toLowerCase();
 
-  // Save to DB
-  await supabase.from("alerts").insert([{ wallet, email }]);
+    // Store or update in Supabase
+    const { error } = await supabase.from("alerts").upsert(
+      { wallet: normalizedWallet, email },
+      { onConflict: "wallet" }
+    );
 
-  // Add wallet to Moralis Stream
-  await axios.post(
-    "https://api.moralis-streams.com/api/v2/streams/add-address",
-    {
-      id: "YOUR_STREAM_ID", 
-      address: wallet
-    },
-    {
-      headers: { "x-api-key": process.env.MORALIS_STREAM_SECRET }
+    if (error) {
+      console.error("Supabase Insert Error:", error);
+      return res.status(500).json({ error: "Database error" });
     }
-  );
 
-  res.json({ success: true, message: "Alerts enabled!" });
+    return res.json({ success: true, message: "Alerts enabled" });
+  } catch (err) {
+    console.error("Enable Alert Error:", err);
+    return res.status(500).json({ error: "Internal Error" });
+  }
 }
