@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Web3 Dashboard</title>
+  
+  <!-- NEW Etherscan + Price API config -->
+  <script>
+    window.__ETHERSCAN_API_KEY__ = "29WB2GZD1G2MGRVZ54JB474DNR3SA9J7MY";
+    window.__PRICE_API__ = "https://api.dexscreener.io/latest/dex/tokens/"; 
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-body">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+      <h2 class="logo">Crypto<span>Hub</span></h2>
+
+      <nav class="menu">
+          <a class="active">Dashboard</a>
+      </nav>
+
+      <div class="card glass" style="margin-top:20px;">
+    <h2>🔔 Email Alerts</h2>
+    <p id="alertStatus" class="info small">Checking...</p>
+
+    <input id="alertEmail" type="email" placeholder="Enter your email" style="padding:10px;width:100%;">
+
+    <button id="enableAlertsBtn" onclick="enableAlerts()" style="margin-top:10px;width:100%;">
+        Enable Alerts
+    </button>
+
+    <button id="disableAlertsBtn" onclick="disableAlerts()" style="margin-top:10px;width:100%;display:none;">
+        Disable Alerts
+    </button>
+    </div>
+
+
+      <!-- Logout button -->
+      <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+  </aside>
+  <script>
+    window.location.href = "/";
+  </script>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div style="margin-top: 0px;">
+        <h2 id="title2">Search Wallet Transactions</h2>
+
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+            
+            <input 
+                id="searchAddress"
+                type="text" 
+                placeholder="Enter wallet address..." 
+                style="padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;">
+            
+            <button 
+                id="searchBtn"
+                onclick="searchWalletTransactions()" 
+                style="padding: 12px 18px; border-radius: 10px; background: #00DDFC; border: none; cursor: pointer; font-weight: bold; color: #000;">
+                🔍 Search
+            </button>
+        </div>
+
+        <!-- ADD THIS LINE - Very Important! -->
+        <div id="transactionResults" style="margin-top: 20px;"></div>
+      <br>
+      <h1 class="page-title">Your Web3 Dashboard</h1>     
+
+      <!-- Network Selector -->
+      <div class="network-selector">
+        <button class="network-btn active" data-network="mainnet" onclick="switchNetwork('mainnet')">
+            🌐 Mainnet
+        </button>
+        <button class="network-btn" data-network="testnet" onclick="switchNetwork('testnet')">
+            🧪 Testnet
+        </button>
+      </div>
+
+      <p class="current-network">Connected to: <strong id="networkName">Mainnet</strong></p>
+
+      <div class="grid">
+
+          <!-- Wallet Card -->
+          <div class="card glass">
+              <h2>Wallet Address</h2>
+              <p id="wallet" class="info">Loading...</p>
+          </div>
+
+          <!-- Balance Card -->
+          <div class="card glass">
+              <h2>Portfolio Value</h2>
+              <p id="portfolioValue" class="info small">loading...</p>
+              <br>
+              <h3>ETH Balance</h3>
+              <p id="ethBalance" class="big-info">Loading...</p>
+              <p id="ethPrice" class="info small"></p>
+          </div>
+
+          <!-- Token List -->
+          <div class="card glass wide">
+              <h2>Your Tokens (Real-time)</h2>
+
+              <table class="token-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                      <tr style="background: rgba(77,210,255,0.1); border-bottom: 2px solid rgba(255,255,255,0.2);">
+                          <th style="padding: 12px; text-align: left;">Token</th>
+                          <th style="padding: 12px; text-align: left;">Amount</th>
+                          <th style="padding: 12px; text-align: left;">Avg Price</th>
+                          <th style="padding: 12px; text-align: left;">Current Price</th>
+                          <th style="padding: 12px; text-align: left;">Profit/Loss</th>
+                          <th style="padding: 12px; text-align: left;">Current Value</th>
+                          <th style="padding: 12px; text-align: left;">Action</th>
+                      </tr>
+                  </thead>
+
+                  <tbody id="tokens">
+                      <tr>
+                          <td colspan="7" style="padding: 20px; text-align: center;">Loading...</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+
+      </div>
+
+  </div>
+
+  <!-- JS Order Must Remain Same -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
