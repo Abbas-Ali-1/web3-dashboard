@@ -1,16 +1,9 @@
 {
-  "name": "crypto-alert-backend",
+  "name": "cryptohub-backend",
   "version": "1.0.0",
   "type": "module",
-  "private": true,
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.1",
     "resend": "^2.1.0"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }
