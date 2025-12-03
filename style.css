@@ -290,3 +290,248 @@ th{padding-right: 300px;
 #title2{
     margin-left: 37%;
 }
+
+
+
+
+
+
+/* Page title - add some right padding so it doesn't overlap with buttons */
+.page-title {
+    font-size: 30px;
+    margin-bottom: 30px;
+    padding-right: 400px; /* Give space for the buttons */
+}
+
+/* Wallet Search Section - Center Top */
+.wallet-search-card {
+  margin-bottom: 20px;
+}
+
+.wallet-search-card h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #4dd2ff;
+}
+
+.wallet-search-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.wallet-search-input {
+  flex: 1;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.wallet-search-input::placeholder {
+  color: rgba(255,255,255,0.5);
+  font-weight: 400;
+}
+
+.wallet-search-input:focus {
+  outline: none;
+  border-color: #4dd2ff;
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 20px rgba(77,210,255,0.3);
+}
+
+.wallet-search-btn {
+  padding: 16px 35px;
+  background: linear-gradient(135deg, #4dd2ff, #32c4f8);
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 5px 20px rgba(77,210,255,0.2);
+}
+
+.wallet-search-btn:hover {
+  background: linear-gradient(135deg, #32c4f8, #1ab3e6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(77,210,255,0.4);
+}
+
+.wallet-search-btn:active {
+  transform: translateY(-1px);
+}
+
+/* Email Alert Subscription Section */
+.email-alert-card {
+  margin-bottom: 20px;
+}
+
+.email-alert-card h2 {
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #4dd2ff;
+}
+
+.alert-description {
+  opacity: 0.8;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.alert-form {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.alert-email-input {
+  flex: 1;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  transition: 0.3s;
+}
+
+.alert-email-input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+.alert-email-input:focus {
+  outline: none;
+  border-color: #4dd2ff;
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 20px rgba(77,210,255,0.3);
+}
+
+.subscribe-btn {
+  padding: 16px 35px;
+  background: linear-gradient(135deg, #4dd2ff, #32c4f8);
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 5px 20px rgba(77,210,255,0.2);
+}
+
+.subscribe-btn:hover {
+  background: linear-gradient(135deg, #32c4f8, #1ab3e6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(77,210,255,0.4);
+}
+
+.subscribe-btn:active {
+  transform: translateY(-1px);
+}
+
+.btn-loader {
+  display: none;
+}
+
+.alert-status {
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.alert-status.success {
+  background: rgba(77,210,255,0.1);
+  border: 1px solid #4dd2ff;
+  color: #4dd2ff;
+}
+
+.alert-status.error {
+  background: rgba(255,77,109,0.1);
+  border: 1px solid #ff4d6d;
+  color: #ff4d6d;
+}
+
+.alert-status.active {
+  background: rgba(77,210,255,0.15);
+  border: 1px solid #4dd2ff;
+  color: #fff;
+}
+
+.alert-status.inactive {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+}
+
+.subscription-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subscription-info strong {
+  font-size: 16px;
+}
+
+.subscription-info p {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.unsubscribe-btn {
+  padding: 10px 20px;
+  background: rgba(255,77,109,0.2);
+  border: 1px solid #ff4d6d;
+  border-radius: 8px;
+  color: #ff4d6d;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  font-family: 'Poppins', sans-serif;
+  align-self: flex-start;
+}
+
+.unsubscribe-btn:hover {
+  background: rgba(255,77,109,0.3);
+  transform: translateY(-2px);
+}
+
+.alert-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.feature-item {
+  font-size: 13px;
+  opacity: 0.8;
+  padding-left: 5px;
+}
+
+@media (max-width: 768px) {
+  .alert-form {
+    flex-direction: column;
+  }
+  
+  .alert-features {
+    grid-template-columns: 1fr;
+  }
+}

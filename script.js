@@ -484,3 +484,68 @@ async function logoutWallet() {
   console.log("→ Redirecting to index.html");
   window.location.replace("index.html");
 }
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const connectBtn = document.getElementById("myButton");
+  if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    console.log("✓ Logout button found");
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("🔴 Logout button clicked!");
+      logoutWallet();
+    });
+  }
+
+  // Wallet Search Button
+  const searchBtn = document.getElementById("walletSearchBtn");
+  if (searchBtn) {
+    searchBtn.addEventListener("click", handleWalletSearch);
+  }
+
+  // Allow Enter key in search input
+  const searchInput = document.getElementById("walletSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        handleWalletSearch();
+      }
+    });
+  }
+
+  // Email Alert Subscription Button
+  const subscribeBtn = document.getElementById("subscribeAlertBtn");
+  if (subscribeBtn) {
+    subscribeBtn.addEventListener("click", handleEmailAlertSubscription);
+  }
+
+  // Allow Enter key in email input
+  const emailInput = document.getElementById("alertEmail");
+  if (emailInput) {
+    emailInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        handleEmailAlertSubscription();
+      }
+    });
+  }
+
+  if (window.location.pathname.includes("dashboard.html")) {
+    checkAuth();
+    checkAlertSubscriptionStatus();
+  }
+  
+  if (window.location.pathname.includes("index.html") || window.location.pathname === "/") {
+    const wallet = localStorage.getItem("wallet");
+    if (wallet) {
+      console.log("✓ User already connected, redirecting to dashboard");
+      window.location.href = "dashboard.html";
+    }
+  }
+});

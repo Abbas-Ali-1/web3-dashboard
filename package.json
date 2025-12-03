@@ -1,9 +1,20 @@
 {
-  "name": "cryptohub-backend",
+  "name": "web3-transaction-alerts",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Web3 Dashboard with Email Transaction Alerts",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.1",
-    "resend": "^2.1.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "resend": "^3.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
